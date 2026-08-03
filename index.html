@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOAL VAULT — GRID</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#050506;
+    --grid-line: rgba(255,255,255,0.12);
+    --cell-bg: rgba(255,255,255,0.02);
+    --text:#f2f2f4;
+    --sub:#9a9ea6;
+
+    --blue:#3b74c9;
+    --violet:#3f2d6e;
+    --orange:#d9720c;
+    --gray:#6b7280;
+    --skyblue:#4a90e2;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+  body{padding:24px 12px 70px;}
+
+  header.top{text-align:center;margin-bottom:22px;}
+  header.top .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:3px;color:#d4af37;opacity:.85;text-transform:uppercase;
+  }
+  header.top h1{
+    font-family:'Orbitron',sans-serif;font-weight:900;
+    font-size:clamp(26px,5vw,40px);letter-spacing:2px;margin:8px 0 6px;
+    background:linear-gradient(120deg,#fff,#d4af37 55%,#3f2d6e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  header.top .sub{font-size:13px;color:var(--sub);}
+
+  .header-edit{
+    display:flex;justify-content:center;gap:16px;margin-top:12px;flex-wrap:wrap;
+  }
+  .header-edit label{
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sub);
+    display:flex;align-items:center;gap:6px;
+  }
+  .header-edit input{
+    background:var(--cell-bg);border:1px solid var(--grid-line);border-radius:6px;
+    color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;
+    padding:5px 8px;width:120px;
+  }
+  .header-edit input:focus{outline:1px solid #d4af37;}
+
+  .grid-scroll{
+    overflow-x:auto;
+    border:1px solid var(--grid-line);
+    border-radius:10px;
+    max-width:1400px;
+    margin:0 auto;
+  }
+
+  table.vault-grid{
+    border-collapse:collapse;
+    width:100%;
+    min-width:980px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+  }
+
+  table.vault-grid td, table.vault-grid th{
+    border:1px solid var(--grid-line);
+    padding:8px 10px;
+    background:var(--cell-bg);
+    white-space:nowrap;
+  }
+
+  /* header band per category */
+  th.cat-head{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    text-align:left;
+    color:#fff;
+    letter-spacing:.3px;
+  }
+  th.cat-head input{
+    background:transparent;border:none;color:#fff;font-family:'Inter',sans-serif;
+    font-weight:700;font-size:14px;width:100%;outline:none;
+  }
+
+  td.label{color:var(--sub);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;width:96px;}
+  td.value{text-align:right;font-weight:600;}
+  td.value input{
+    width:100%;background:transparent;border:none;color:var(--text);
+    font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;outline:none;
+  }
+  td.value input:focus{background:rgba(255,255,255,0.06);border-radius:4px;}
+
+  tr.total-row td{font-weight:700;background:rgba(255,255,255,0.05);}
+  tr.total-row td.value{font-size:14px;}
+
+  td.donut-cell{
+    text-align:center;
+    padding:14px 6px;
+  }
+  .donut{
+    width:96px;height:96px;border-radius:50%;
+    margin:0 auto;position:relative;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .donut::after{
+    content:'';position:absolute;width:56px;height:56px;border-radius:50%;background:#0a0a0c;
+  }
+  .donut .pct{position:relative;z-index:2;font-weight:700;font-size:13px;}
+
+  tr.month-hdr td{
+    font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);
+    background:rgba(255,255,255,0.04);
+  }
+  tr.month-row.current td{color:#fff;}
+  tr.month-row.current td.label{font-weight:700;}
+
+  tr.pct-row td{
+    text-align:center;font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;
+    padding:14px 6px;
+  }
+
+  .foot-note{text-align:center;margin-top:30px;font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;}
+  .foot-note button{
+    background:none;border:1px solid var(--grid-line);color:var(--sub);
+    font-family:'JetBrains Mono',monospace;font-size:11px;
+    padding:6px 12px;border-radius:100px;cursor:pointer;margin-top:10px;
+  }
+  .foot-note button:hover{border-color:#e0284a;color:#e0284a;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow"><span id="yearDisplay">2026</span> MILESTONE VAULT — <span id="nameDisplay">MAXIMUS</span></div>
+  <h1>GOAL VAULT</h1>
+  <div class="header-edit">
+    <label>Name <input id="nameInput" type="text" placeholder="Your name" /></label>
+    <label>Year <input id="yearInput" type="number" placeholder="2026" /></label>
+  </div>
+</header>
+
+<div class="grid-scroll">
+  <table class="vault-grid" id="vaultTable"></table>
+</div>
+
+<div class="foot-note">
+  Data saves automatically to this browser. <br>
+  <button id="resetBtn">Reset for New Year</button>
+</div>
+
+<script>
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const STORAGE_KEY = 'goalVaultGridData_v1';
+const META_KEY = 'goalVaultMeta_v1';
+
+function loadMeta(){
+  try{
+    const raw = localStorage.getItem(META_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { name:'MAXIMUS', year: new Date().getFullYear() };
+}
+let meta = loadMeta();
+function saveMeta(){ try{ localStorage.setItem(META_KEY, JSON.stringify(meta)); }catch(e){} }
+
+function renderMeta(){
+  document.getElementById('nameDisplay').textContent = (meta.name || 'MAXIMUS').toUpperCase();
+  document.getElementById('yearDisplay').textContent = meta.year;
+  document.getElementById('nameInput').value = meta.name || '';
+  document.getElementById('yearInput').value = meta.year;
+}
+
+const DEFAULT_GOALS = [
+  { id:'roth',      name:'ROTH IRA',        color:'blue',    goal:0, starting:0, inverse:false },
+  { id:'networth',  name:'NET WORTH',       color:'violet',  goal:0, starting:0, inverse:false },
+  { id:'football',  name:'FOOTBALL INCOME', color:'orange',  goal:0, starting:0, inverse:false },
+  { id:'extra',     name:'EXTRA INCOME',    color:'gray',    goal:0, starting:0, inverse:false },
+  { id:'spend',     name:'SPEND LIMIT',     color:'skyblue', goal:0, starting:0, inverse:true  },
+];
+
+const ACCENTS = { blue:'#3b74c9', violet:'#3f2d6e', orange:'#d9720c', gray:'#6b7280', skyblue:'#4a90e2' };
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  const fresh = {};
+  DEFAULT_GOALS.forEach(g=>{
+    fresh[g.id] = { name:g.name, goal:g.goal, starting:g.starting, months:Array(12).fill(null) };
+  });
+  return fresh;
+}
+let data = loadData();
+function saveData(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){} }
+
+function fmt(n){
+  if(n===null||n===undefined||isNaN(n)) return '$0.00';
+  return '$' + Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function currentMonthIndex(){ return new Date().getMonth(); }
+
+function computeTotals(g){
+  const ytd = g.months.reduce((a,b)=>a+(Number(b)||0),0);
+  const remaining = g.goal - ytd;
+  const total = g.starting + ytd;
+  const pct = g.goal>0 ? Math.min(100,(ytd/g.goal)*100) : 0;
+  return { ytd, remaining, total, pct };
+}
+function donutGradient(pct, accent){
+  const deg = Math.max(0, Math.min(360, pct*3.6));
+  return `conic-gradient(${accent} 0deg ${deg}deg, rgba(255,255,255,0.1) ${deg}deg 360deg)`;
+}
+
+function render(){
+  const table = document.getElementById('vaultTable');
+  const curMonth = currentMonthIndex();
+
+  let html = '<thead><tr>';
+  DEFAULT_GOALS.forEach(meta=>{
+    const accent = ACCENTS[meta.color];
+    html += `<th class="cat-head" colspan="2" style="background:${accent}"><input data-role="name" data-id="${meta.id}" value="${data[meta.id].name}" /></th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  const rows = [
+    {label:'Goal', key:'goal'},
+    {label:'Starting', key:'starting'},
+    {label:'Total YTD', key:'ytd'},
+    {label:'Remaining', key:'remaining'},
+  ];
+
+  rows.forEach(r=>{
+    html += '<tr>';
+    DEFAULT_GOALS.forEach(meta=>{
+      const g = data[meta.id];
+      const t = computeTotals(g);
+      html += `<td class="label">${r.label}</td>`;
+      if(r.key==='goal'){
+        html += `<td class="value"><input data-role="goal" data-id="${meta.id}" type="number" value="${g.goal}" /></td>`;
+      } else if(r.key==='starting'){
+        html += `<td class="value"><input data-role="starting" data-id="${meta.id}" type="number" value="${g.starting}" /></td>`;
+      } else if(r.key==='ytd'){
+        html += `<td class="value" id="ytd-${meta.id}">${fmt(t.ytd)}</td>`;
+      } else if(r.key==='remaining'){
+        const col = t.remaining<0 ? '#e0284a' : '';
+        html += `<td class="value" id="remaining-${meta.id}" style="color:${col}">${fmt(t.remaining)}</td>`;
+      }
+    });
+    html += '</tr>';
+  });
+
+  // total row
+  html += '<tr class="total-row">';
+  DEFAULT_GOALS.forEach(meta=>{
+    const g = data[meta.id];
+    const t = computeTotals(g);
+    html += `<td class="label">${meta.inverse ? 'TOTAL SPENT' : 'TOTAL'}</td><td class="value" id="total-${meta.id}">${fmt(t.total)}</td>`;
+  });
+  html += '</tr>';
+
+  // donut row
+  html += '<tr>';
+  DEFAULT_GOALS.forEach(meta=>{
+    const g = data[meta.id];
+    const accent = ACCENTS[meta.color];
+    const t = computeTotals(g);
+    html += `<td class="donut-cell" colspan="2">
+      <div class="donut" id="donut-${meta.id}" style="background:${donutGradient(t.pct,accent)}">
+        <div class="pct" id="donutpct-${meta.id}">${t.pct.toFixed(1)}%</div>
+      </div>
+    </td>`;
+  });
+  html += '</tr>';
+
+  // month header row
+  html += '<tr class="month-hdr">';
+  DEFAULT_GOALS.forEach(()=>{
+    html += `<td>Month</td><td style="text-align:right;">Value</td>`;
+  });
+  html += '</tr>';
+
+  // month rows
+  for(let i=0;i<12;i++){
+    html += `<tr class="month-row ${i===curMonth?'current':''}">`;
+    DEFAULT_GOALS.forEach(meta=>{
+      const g = data[meta.id];
+      const v = g.months[i];
+      html += `<td class="label">${MONTHS[i]}</td>
+        <td class="value"><input data-role="month" data-id="${meta.id}" data-idx="${i}" type="number" step="0.01" placeholder="—" value="${v===null||v===undefined?'':v}" /></td>`;
+    });
+    html += '</tr>';
+  }
+
+  // percent row
+  html += '<tr class="pct-row">';
+  DEFAULT_GOALS.forEach(meta=>{
+    const g = data[meta.id];
+    const t = computeTotals(g);
+    const accent = ACCENTS[meta.color];
+    html += `<td colspan="2" id="pctrow-${meta.id}" style="color:${accent}">${t.pct.toFixed(2)}%</td>`;
+  });
+  html += '</tr>';
+
+  html += '</tbody>';
+  table.innerHTML = html;
+
+  // wire events
+  table.querySelectorAll('[data-role="name"]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      data[e.target.dataset.id].name = e.target.value;
+      saveData();
+    });
+  });
+  table.querySelectorAll('[data-role="goal"]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      data[e.target.dataset.id].goal = parseFloat(e.target.value)||0;
+      saveData(); updateComputed(e.target.dataset.id);
+    });
+  });
+  table.querySelectorAll('[data-role="starting"]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      data[e.target.dataset.id].starting = parseFloat(e.target.value)||0;
+      saveData(); updateComputed(e.target.dataset.id);
+    });
+  });
+  table.querySelectorAll('[data-role="month"]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const idx = parseInt(e.target.dataset.idx,10);
+      const val = e.target.value==='' ? null : parseFloat(e.target.value);
+      data[e.target.dataset.id].months[idx] = val;
+      saveData(); updateComputed(e.target.dataset.id);
+    });
+  });
+}
+
+function updateComputed(id){
+  const meta = DEFAULT_GOALS.find(m=>m.id===id);
+  const g = data[id];
+  const accent = ACCENTS[meta.color];
+  const t = computeTotals(g);
+
+  document.getElementById(`ytd-${id}`).textContent = fmt(t.ytd);
+
+  const remEl = document.getElementById(`remaining-${id}`);
+  remEl.textContent = fmt(t.remaining);
+  remEl.style.color = t.remaining < 0 ? '#e0284a' : '';
+
+  document.getElementById(`total-${id}`).textContent = fmt(t.total);
+
+  document.getElementById(`donut-${id}`).style.background = donutGradient(t.pct, accent);
+  document.getElementById(`donutpct-${id}`).textContent = t.pct.toFixed(1) + '%';
+
+  document.getElementById(`pctrow-${id}`).textContent = t.pct.toFixed(2) + '%';
+}
+
+document.getElementById('nameInput').addEventListener('input', e=>{
+  meta.name = e.target.value;
+  document.getElementById('nameDisplay').textContent = (meta.name || 'MAXIMUS').toUpperCase();
+  saveMeta();
+});
+document.getElementById('yearInput').addEventListener('input', e=>{
+  meta.year = e.target.value;
+  document.getElementById('yearDisplay').textContent = meta.year;
+  saveMeta();
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm('Start a new year? This clears every goal, monthly entry, and total — the name and year stay put so you can set the year yourself.')){
+    localStorage.removeItem(STORAGE_KEY);
+    data = loadData();
+    render();
+  }
+});
+
+renderMeta();
+render();
+</script>
+</body>
+</html>
