@@ -5,20 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GOAL VAULT — GRID</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
 
   :root{
-    --bg:#050506;
-    --grid-line: rgba(255,255,255,0.12);
-    --cell-bg: rgba(255,255,255,0.02);
-    --text:#f2f2f4;
-    --sub:#9a9ea6;
+    --bg:#f7f8fa;
+    --grid-line:#d4d8dd;
+    --text:#1b2229;
+    --sub:#5b6570;
 
-    --blue:#3b74c9;
-    --violet:#3f2d6e;
-    --orange:#d9720c;
-    --gray:#6b7280;
-    --skyblue:#4a90e2;
+    --blue:#2f6fd6;       --blue-tint:#eaf2fd;
+    --violet:#4b2e83;     --violet-tint:#efeaf8;
+    --orange:#e07b0e;     --orange-tint:#fdf0df;
+    --gray:#6b7280;       --gray-tint:#f0f1f3;
+    --skyblue:#3b93e0;    --skyblue-tint:#e9f4fc;
   }
 
   *{box-sizing:border-box;}
@@ -28,13 +27,12 @@
   header.top{text-align:center;margin-bottom:22px;}
   header.top .eyebrow{
     font-family:'JetBrains Mono',monospace;
-    font-size:11px;letter-spacing:3px;color:#d4af37;opacity:.85;text-transform:uppercase;
+    font-size:11px;letter-spacing:3px;color:var(--orange);opacity:.9;text-transform:uppercase;
   }
   header.top h1{
-    font-family:'Orbitron',sans-serif;font-weight:900;
-    font-size:clamp(26px,5vw,40px);letter-spacing:2px;margin:8px 0 6px;
-    background:linear-gradient(120deg,#fff,#d4af37 55%,#3f2d6e);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-family:'Poppins',sans-serif;font-weight:800;
+    font-size:clamp(26px,5vw,40px);letter-spacing:1px;margin:8px 0 6px;
+    color:var(--violet);
   }
   header.top .sub{font-size:13px;color:var(--sub);}
 
@@ -46,11 +44,11 @@
     display:flex;align-items:center;gap:6px;
   }
   .header-edit input{
-    background:var(--cell-bg);border:1px solid var(--grid-line);border-radius:6px;
+    background:#fff;border:1px solid var(--grid-line);border-radius:6px;
     color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;
     padding:5px 8px;width:120px;
   }
-  .header-edit input:focus{outline:1px solid #d4af37;}
+  .header-edit input:focus{outline:2px solid var(--orange);}
 
   .grid-scroll{
     overflow-x:auto;
@@ -58,6 +56,8 @@
     border-radius:10px;
     max-width:1400px;
     margin:0 auto;
+    background:#fff;
+    box-shadow:0 8px 30px rgba(20,20,40,0.06);
   }
 
   table.vault-grid{
@@ -71,11 +71,10 @@
   table.vault-grid td, table.vault-grid th{
     border:1px solid var(--grid-line);
     padding:8px 10px;
-    background:var(--cell-bg);
     white-space:nowrap;
   }
 
-  /* header band per category */
+  /* header band per category — solid saturated color, white text */
   th.cat-head{
     font-family:'Inter',sans-serif;
     font-weight:700;
@@ -88,21 +87,30 @@
     background:transparent;border:none;color:#fff;font-family:'Inter',sans-serif;
     font-weight:700;font-size:14px;width:100%;outline:none;
   }
+  th.cat-head input::placeholder{color:rgba(255,255,255,0.7);}
 
-  td.label{color:var(--sub);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;width:96px;}
-  td.value{text-align:right;font-weight:600;}
+  /* pastel column tints per category */
+  td.cat-blue{background:var(--blue-tint);}
+  td.cat-violet{background:var(--violet-tint);}
+  td.cat-orange{background:var(--orange-tint);}
+  td.cat-gray{background:var(--gray-tint);}
+  td.cat-skyblue{background:var(--skyblue-tint);}
+
+  td.label{color:var(--sub);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;width:96px;font-weight:600;}
+  td.value{text-align:right;font-weight:700;color:var(--text);}
   td.value input{
     width:100%;background:transparent;border:none;color:var(--text);
-    font-family:'JetBrains Mono',monospace;font-size:13px;text-align:right;outline:none;
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;text-align:right;outline:none;
   }
-  td.value input:focus{background:rgba(255,255,255,0.06);border-radius:4px;}
+  td.value input:focus{background:rgba(0,0,0,0.05);border-radius:4px;}
 
-  tr.total-row td{font-weight:700;background:rgba(255,255,255,0.05);}
-  tr.total-row td.value{font-size:14px;}
+  tr.total-row td{font-weight:800;box-shadow:inset 0 -2px 0 rgba(0,0,0,0.08);}
+  tr.total-row td.value{font-size:14.5px;}
 
   td.donut-cell{
     text-align:center;
     padding:14px 6px;
+    background:#fff !important;
   }
   .donut{
     width:96px;height:96px;border-radius:50%;
@@ -110,29 +118,27 @@
     display:flex;align-items:center;justify-content:center;
   }
   .donut::after{
-    content:'';position:absolute;width:56px;height:56px;border-radius:50%;background:#0a0a0c;
+    content:'';position:absolute;width:56px;height:56px;border-radius:50%;background:#fff;
   }
-  .donut .pct{position:relative;z-index:2;font-weight:700;font-size:13px;}
+  .donut .pct{position:relative;z-index:2;font-weight:700;font-size:13px;color:var(--text);}
 
   tr.month-hdr td{
-    font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);
-    background:rgba(255,255,255,0.04);
+    font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);font-weight:700;
   }
-  tr.month-row.current td{color:#fff;}
-  tr.month-row.current td.label{font-weight:700;}
+  tr.month-row.current td{font-weight:800;box-shadow:inset 0 0 0 1.5px rgba(224,123,14,0.45);}
 
   tr.pct-row td{
     text-align:center;font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;
-    padding:14px 6px;
+    padding:14px 6px;background:#fff !important;
   }
 
   .foot-note{text-align:center;margin-top:30px;font-size:11px;color:var(--sub);font-family:'JetBrains Mono',monospace;}
   .foot-note button{
-    background:none;border:1px solid var(--grid-line);color:var(--sub);
+    background:#fff;border:1px solid var(--grid-line);color:var(--sub);
     font-family:'JetBrains Mono',monospace;font-size:11px;
     padding:6px 12px;border-radius:100px;cursor:pointer;margin-top:10px;
   }
-  .foot-note button:hover{border-color:#e0284a;color:#e0284a;}
+  .foot-note button:hover{border-color:#d6334a;color:#d6334a;}
 </style>
 </head>
 <body>
@@ -185,7 +191,7 @@ const DEFAULT_GOALS = [
   { id:'spend',     name:'SPEND LIMIT',     color:'skyblue', goal:0, starting:0, inverse:true  },
 ];
 
-const ACCENTS = { blue:'#3b74c9', violet:'#3f2d6e', orange:'#d9720c', gray:'#6b7280', skyblue:'#4a90e2' };
+const ACCENTS = { blue:'#2f6fd6', violet:'#4b2e83', orange:'#e07b0e', gray:'#6b7280', skyblue:'#3b93e0' };
 
 function loadData(){
   try{
@@ -216,7 +222,7 @@ function computeTotals(g){
 }
 function donutGradient(pct, accent){
   const deg = Math.max(0, Math.min(360, pct*3.6));
-  return `conic-gradient(${accent} 0deg ${deg}deg, rgba(255,255,255,0.1) ${deg}deg 360deg)`;
+  return `conic-gradient(${accent} 0deg ${deg}deg, #e4e7eb ${deg}deg 360deg)`;
 }
 
 function render(){
@@ -242,16 +248,17 @@ function render(){
     DEFAULT_GOALS.forEach(meta=>{
       const g = data[meta.id];
       const t = computeTotals(g);
-      html += `<td class="label">${r.label}</td>`;
+      const cc = `cat-${meta.color}`;
+      html += `<td class="label ${cc}">${r.label}</td>`;
       if(r.key==='goal'){
-        html += `<td class="value"><input data-role="goal" data-id="${meta.id}" type="number" value="${g.goal}" /></td>`;
+        html += `<td class="value ${cc}"><input data-role="goal" data-id="${meta.id}" type="number" value="${g.goal}" /></td>`;
       } else if(r.key==='starting'){
-        html += `<td class="value"><input data-role="starting" data-id="${meta.id}" type="number" value="${g.starting}" /></td>`;
+        html += `<td class="value ${cc}"><input data-role="starting" data-id="${meta.id}" type="number" value="${g.starting}" /></td>`;
       } else if(r.key==='ytd'){
-        html += `<td class="value" id="ytd-${meta.id}">${fmt(t.ytd)}</td>`;
+        html += `<td class="value ${cc}" id="ytd-${meta.id}">${fmt(t.ytd)}</td>`;
       } else if(r.key==='remaining'){
-        const col = t.remaining<0 ? '#e0284a' : '';
-        html += `<td class="value" id="remaining-${meta.id}" style="color:${col}">${fmt(t.remaining)}</td>`;
+        const col = t.remaining<0 ? '#d6334a' : '';
+        html += `<td class="value ${cc}" id="remaining-${meta.id}" style="color:${col}">${fmt(t.remaining)}</td>`;
       }
     });
     html += '</tr>';
@@ -262,7 +269,8 @@ function render(){
   DEFAULT_GOALS.forEach(meta=>{
     const g = data[meta.id];
     const t = computeTotals(g);
-    html += `<td class="label">${meta.inverse ? 'TOTAL SPENT' : 'TOTAL'}</td><td class="value" id="total-${meta.id}">${fmt(t.total)}</td>`;
+    const cc = `cat-${meta.color}`;
+    html += `<td class="label ${cc}">${meta.inverse ? 'TOTAL SPENT' : 'TOTAL'}</td><td class="value ${cc}" id="total-${meta.id}">${fmt(t.total)}</td>`;
   });
   html += '</tr>';
 
@@ -282,8 +290,9 @@ function render(){
 
   // month header row
   html += '<tr class="month-hdr">';
-  DEFAULT_GOALS.forEach(()=>{
-    html += `<td>Month</td><td style="text-align:right;">Value</td>`;
+  DEFAULT_GOALS.forEach(meta=>{
+    const cc = `cat-${meta.color}`;
+    html += `<td class="${cc}">Month</td><td class="${cc}" style="text-align:right;">Value</td>`;
   });
   html += '</tr>';
 
@@ -293,8 +302,9 @@ function render(){
     DEFAULT_GOALS.forEach(meta=>{
       const g = data[meta.id];
       const v = g.months[i];
-      html += `<td class="label">${MONTHS[i]}</td>
-        <td class="value"><input data-role="month" data-id="${meta.id}" data-idx="${i}" type="number" step="0.01" placeholder="—" value="${v===null||v===undefined?'':v}" /></td>`;
+      const cc = `cat-${meta.color}`;
+      html += `<td class="label ${cc}">${MONTHS[i]}</td>
+        <td class="value ${cc}"><input data-role="month" data-id="${meta.id}" data-idx="${i}" type="number" step="0.01" placeholder="—" value="${v===null||v===undefined?'':v}" /></td>`;
     });
     html += '</tr>';
   }
@@ -351,7 +361,7 @@ function updateComputed(id){
 
   const remEl = document.getElementById(`remaining-${id}`);
   remEl.textContent = fmt(t.remaining);
-  remEl.style.color = t.remaining < 0 ? '#e0284a' : '';
+  remEl.style.color = t.remaining < 0 ? '#d6334a' : '';
 
   document.getElementById(`total-${id}`).textContent = fmt(t.total);
 
